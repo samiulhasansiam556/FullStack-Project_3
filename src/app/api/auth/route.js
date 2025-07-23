@@ -1,6 +1,5 @@
-
-import DBConnection from "@/lib/Db";
-import User from "@/models/userModel";
+import DBConnection from "@/lib/Db.js";
+import User from "@/models/userModel.js";
 
 
 import bcrypt from "bcryptjs";

@@ -11,7 +11,7 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(req,{params}){
 
-    const id = params.id;
+    const {id} =await params;
     console.log(id);
     await DBConnection();
 

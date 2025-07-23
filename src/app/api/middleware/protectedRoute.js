@@ -26,8 +26,7 @@ export function middleware(req) {
   } catch (error) {
     console.error("Token verification failed:", error);
     return NextResponse.json(
-      { status: 401, message: "Invalid or expired token" },
-      { status: 401 }
+      { status: 401, message: "Invalid or expired token" }
     );
   }
 }

@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 import { useRouter } from "next/navigation";
@@ -51,21 +52,23 @@ export default function ProfileEditForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Form Data:", formData); // Debugging log
     try {
       const token = document.cookie
         .split("; ")
         .find((row) => row.startsWith("token="))
         ?.split("=")[1];
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile-update`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/profile-update`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (res.ok) {
         alert("Profile updated successfully!");
@@ -78,101 +81,138 @@ export default function ProfileEditForm() {
   };
 
   return (
-    <form className="space-y-4">
-      <div>
-        <label>Name:</label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold mb-6 text-center">Edit Profile</h1>
+
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* LEFT SIDE */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-700 mb-1">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-1">Phone</label>
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-1">Street</label>
+              <input
+                type="text"
+                name="address.street"
+                value={formData.address.street}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-1">City</label>
+              <input
+                type="text"
+                name="address.city"
+                value={formData.address.city}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* RIGHT SIDE */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-700 mb-1">Postal Code</label>
+              <input
+                type="text"
+                name="address.postalCode"
+                value={formData.address.postalCode}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-1">District</label>
+              <input
+                type="text"
+                name="address.district"
+                value={formData.address.district}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-1">Country</label>
+              <input
+                type="text"
+                name="address.country"
+                value={formData.address.country}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+
+            {formData.profileImage && (
+                  <img
+                    src={formData.profileImage}
+                    alt="Profile"
+                    className="w-24 h-24 mx-auto rounded-full object-cover border border-gray-300"
+                  />
+                )}
+
+            <div className="flex flex-col gap-3">
+              <CldUploadWidget
+                signatureEndpoint={`${process.env.NEXT_PUBLIC_API_URL}/cloudinary-sign`}
+                onSuccess={(result) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    profileImage: result.info.secure_url,
+                  }));
+                }}
+              >
+                {({ open }) => (
+                  <button
+                    type="button"
+                    onClick={() => open()}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                  >
+                    Upload Profile Image
+                  </button>
+                )}
+              </CldUploadWidget>
+
+              
+            </div>
+          </div>
+
+          {/* FULL WIDTH SAVE BUTTON */}
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              className="w-full bg-green-600 text-white px-4 py-3 rounded hover:bg-green-700 transition"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
       </div>
-      <div>
-        <label>Phone:</label>
-        <input
-          type="text"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-      </div>
-      <div>
-        <label>Street:</label>
-        <input
-          type="text"
-          name="address.street"
-          value={formData.address.street}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-      </div>
-      <div>
-        <label>City:</label>
-        <input
-          type="text"
-          name="address.city"
-          value={formData.address.city}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-      </div>
-      <div>
-        <label>Postal Code:</label>
-        <input
-          type="text"
-          name="address.postalCode"
-          value={formData.address.postalCode}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-      </div>
-      <div>
-        <label>District:</label>
-        <input
-          type="text"
-          name="address.district"
-          value={formData.address.district}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-      </div>
-      <div>
-        <label>Country:</label>
-        <input
-          type="text"
-          name="address.country"
-          value={formData.address.country}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-      </div>
-      <CldUploadWidget
-        //uploadPreset="profile_picture_signed"
-        signatureEndpoint={`${process.env.NEXT_PUBLIC_API_URL}/cloudinary-sign`}       
-        onSuccess={(result) => {
-         //console.log(211,option);
-          setFormData((prev) => ({
-            ...prev,
-            profileImage: result.info.secure_url, // Save the secure URL of the uploaded image
-          }));
-        }}
-      >
-        {({ open }) => (
-          <button
-            type="button"
-            onClick={() => open()}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Upload an Image
-          </button>
-        )}
-      </CldUploadWidget>
-      <button onClick={handleSubmit} className="bg-blue-500 text-white p-2">
-        Save Changes
-      </button>
-    </form>
+    </div>
   );
 }

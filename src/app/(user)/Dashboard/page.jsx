@@ -18,13 +18,10 @@ export default function Page() {
     if (user && user._id) {
       localStorage.setItem("user", JSON.stringify(user));
 
-      // Fetch posts by user ID
       axios
         .get(`${api}/blog/user/${user._id}`)
         .then((response) => {
-          
-         // console.log("Fetched posts:", response.data);
-          setPosts(response.data.user.blogs); // Assuming response contains an array of posts
+          setPosts(response.data.user.blogs);
           setFetchLoading(false);
         })
         .catch((err) => {
@@ -33,40 +30,85 @@ export default function Page() {
           setFetchLoading(false);
         });
     }
-  }, [user]); // Run when `user` changes
+  }, [user]);
 
-  if (loading || fetchLoading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  const handleDelete = (id) => {
+    axios
+      .delete(`${api}/blog/${id}`)
+      .then(() => {
+        setPosts(posts.filter((post) => post._id !== id));
+      })
+      .catch((err) => {
+        console.error("Error deleting post:", err);
+      });
+  };
+
+  if (loading || fetchLoading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100">
       <NavIn />
 
-      <div className="flex flex-col items-center justify-center h-[90vh]">
-        <h1 className="text-2xl font-bold mb-4">Your Blog Posts</h1>
-        <div className="w-full max-w-2xl">
-          {posts.length > 0 ? (
-            posts.map((post) => (
-              <div key={post._id} className="border p-4 mb-2 rounded-lg shadow">
-                <h2 className="text-lg font-semibold">{post.title}</h2>
-                <p className="text-gray-600">
+      <main className="max-w-4xl mx-auto py-10 px-4">
+        <h1 className="text-3xl font-bold mb-8 text-center">Your Blog Posts</h1>
+
+        {posts.length > 0 ? (
+          <div className="space-y-6">
+            {posts.map((post) => (
+              <div
+                key={post._id}
+                className="bg-white border border-gray-200 p-6 rounded-lg shadow hover:shadow-md transition"
+              >
+                <h2 className="text-xl font-semibold mb-2 text-gray-800">{post.title}</h2>
+                <p className="text-gray-600 mb-4">
                   {post.content.substring(0, 100)}...
                 </p>
-                <Link href={`/blog-details/${post._id}`} className="text-blue-500">
-                  Read more
-                </Link>
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    href={`/blog-details/${post._id}`}
+                    className="text-blue-600 font-medium hover:underline"
+                  >
+                    Read more
+                  </Link>
+                  <Link
+                    href={`/edit-blog/${post._id}`}
+                    className="text-green-600 font-medium hover:underline"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(post._id)}
+                    className="text-red-600 font-medium hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            ))
-          ) : (
-            <p>No posts found</p>
-          )}
-        </div>
-      </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-600">You don&apos;t have any posts yet.</p>
+        )}
+      </main>
 
-      <div className="absolute bottom-10 right-5 md:bottom-20 md:right-10">
-         <button className="bg-blue-500 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-600 transition">
-          <Link href="/create-blog">Create Blog </Link>
-        </button>
+      <div className="fixed bottom-6 right-6">
+        <Link href="/create-blog">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full shadow-lg transition">
+            + Create Blog
+          </button>
+        </Link>
       </div>
     </div>
   );

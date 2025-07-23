@@ -1,4 +1,4 @@
-import NavOut from "@/components/nav/NavOut";
+import NavOut from "../components/nav/NavOut.jsx";
 
 
 export default function Home() {
