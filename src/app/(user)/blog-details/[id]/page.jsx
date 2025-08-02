@@ -14,6 +14,8 @@ export default function BlogDetails() {
   const [likes, setLikes] = useState([]);
   const [comments, setComments] = useState([]);
   const [isLiking, setIsLiking] = useState(false);
+  const [isCommenting, setIsCommenting] = useState(false);
+  const [liked, setLiked] = useState(false);
   const api = process.env.NEXT_PUBLIC_API_URL;
 
   // console.log(id)
@@ -24,6 +26,7 @@ export default function BlogDetails() {
       try {
         const response = await axios.get(`${api}/blog/${id}`);
         setBlog(response.data);
+
       } catch (err) {
         setError('Failed to fetch blog');
       } finally {
@@ -37,7 +40,14 @@ export default function BlogDetails() {
   const fetchLikes = async () => {
     try {
       const response = await axios.get(`${api}/like/${id}`);
+      console.log(response.data.likes);
       setLikes(response.data.likes);
+      const liked = response.data.likes.some(like => like.user._id === blog.blog.user._id);
+     if (liked) {
+        setLiked(true);
+      } else {
+        setLiked(false);
+      }
     } catch (err) {
       console.error('Failed to fetch likes', err);
     }
@@ -58,6 +68,7 @@ export default function BlogDetails() {
       await axios.post(`/api/like/${id}`);
       // Refresh blog data
       const response = await axios.get(`${api}/blog/${id}`);
+
       setBlog(response.data);
       // Refresh likes list
       await fetchLikes();
@@ -132,7 +143,7 @@ export default function BlogDetails() {
             isLiking ? 'bg-blue-300' : 'bg-blue-500 hover:bg-blue-600'
           } text-white`}
         >
-          <span>Like</span>
+          <span>{liked?"Unlike" : "Like"}</span>
           <span>({blog.blog.likes.length})</span>
           {isLiking && (
             <svg className="animate-spin h-4 w-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

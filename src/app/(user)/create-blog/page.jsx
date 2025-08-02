@@ -8,6 +8,7 @@ export default function CreateBlogForm() {
   const {user,setUser} = useAuth();
   const [image, setImage] = useState('');
   const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('');
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -18,19 +19,23 @@ export default function CreateBlogForm() {
     setIsSubmitting(true);
     setError('');
 
+    if (!title || !content || !category) {
+      setError('Please fill in all fields');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/blog', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({ title,category, content }),
       });
-
       if (!response.ok) {
         throw new Error('Failed to create blog');
       }
-
       const data = await response.json();
 
        // console.log('Blog created:', data);
@@ -65,6 +70,21 @@ export default function CreateBlogForm() {
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter blog title"
+            required
+          />
+        </div>
+
+        <div className="mb-6">
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+            Category
+          </label>
+          <input
+            type="text"
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter blog category"
             required
           />
         </div>

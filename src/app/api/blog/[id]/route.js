@@ -12,7 +12,7 @@ import { NextResponse } from "next/server";
 export async function DELETE(req,{params}){
 
     const {id} =await params;
-    console.log(id);
+   // console.log(id);
     await DBConnection();
 
     try{
@@ -43,7 +43,7 @@ export async function DELETE(req,{params}){
 export async function GET(req,{params}){
 
     const {id } =await params;
-    console.log(id);
+    // console.log(id);
     await DBConnection();
 
     try{

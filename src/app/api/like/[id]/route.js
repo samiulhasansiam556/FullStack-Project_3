@@ -12,7 +12,7 @@ import DBConnection from '@/lib/Db';
 
 export async function POST(req,{params}) {
 
-      const id = params.id;
+      const {id }= await params;
       //console.log(id);
 
      await DBConnection();

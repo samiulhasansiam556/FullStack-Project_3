@@ -7,13 +7,13 @@ const blogSchema = new mongoose.Schema({
     blogImage:{type:String},
     user:{type:mongoose.Schema.Types.ObjectId, ref:'User', required:true},
     likes:[{type:mongoose.Schema.Types.ObjectId, ref:'Like'}],
+    Categories:{type:mongoose.Schema.Types.ObjectId, ref:'Category'},
     comments:[{type:mongoose.Schema.Types.ObjectId, ref:'Comment'}]
 }   
 ,
 {
     timestamps:true
 }
-
 );
 
 const Blog = mongoose.models.Blog || mongoose.model('Blog', blogSchema);

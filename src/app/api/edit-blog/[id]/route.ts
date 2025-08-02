@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req:NextRequest, { params }) {
     const { id } = await params;
-    console.log("id", id);
+   // console.log("id", id);
     await DBConnection();
     try{
         const decoded = middleware(req);

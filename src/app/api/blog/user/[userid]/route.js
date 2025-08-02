@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
     const { userid } =await params; // Extracting userId from the request parameters
-    console.log("User ID:", userid); // Logging the userId for debugging
+    //console.log("User ID:", userid); // Logging the userId for debugging
 
     await DBConnection(); // Ensure the database connection is established
 
@@ -23,7 +23,7 @@ export async function GET(req, { params }) {
             path: "blogs",
             model: "Blog" // Explicitly declare model
           });
-        console.log("zdfguse",user.blogs);
+       // console.log("zdfguse",user.blogs);
         if (!user) {
             return NextResponse.json({ status: 400, message: "User does not exist" });
         }
