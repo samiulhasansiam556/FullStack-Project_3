@@ -3,11 +3,16 @@
 import { useState, useEffect } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useAuth } from "@/hooks/userAuth";
 
 export default function ProfileEditForm() {
+  const { user } = useAuth();
+  console.log(user)
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
     phone: "",
     address: {
       street: "",
@@ -18,12 +23,13 @@ export default function ProfileEditForm() {
     },
     profileImage: "",
   });
-
+  
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedUser = JSON.parse(localStorage.getItem("user")) || {};
       setFormData({
         name: storedUser?.name || "",
+        username: storedUser?.username || "",
         phone: storedUser?.phone || "",
         address: {
           street: storedUser?.address?.street || "",
@@ -36,7 +42,7 @@ export default function ProfileEditForm() {
       });
     }
   }, []);
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name.includes("address.")) {
@@ -53,33 +59,29 @@ export default function ProfileEditForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="))
-        ?.split("=")[1];
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/profile-update`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
+      const res = axios.put("/api/profile-update", formData,)
+      .then((response) => {
+        console.log(response.data);
+        if (response.data.status === 200) {
+          localStorage.setItem("user", JSON.stringify(response.data));
+          alert("Profile updated successfully");
+          router.push("/profile-edit");
+        }else {
+          alert(response.data.message || "Failed to update profile");
         }
-      );
-
-      if (res.ok) {
-        alert("Profile updated successfully!");
-      } else {
+      })
+      .catch((error) => {
+        console.error("Error updating profile:", error);
         alert("Failed to update profile");
-      }
+      });
     } catch (error) {
       alert("Error updating profile");
     }
+    if (!user) {
+      return <div>Loading...</div>;
+    }
   };
-
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-md">
@@ -94,6 +96,17 @@ export default function ProfileEditForm() {
                 type="text"
                 name="name"
                 value={formData.name}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+             <div>
+              <label className="block text-gray-700 mb-1">User name</label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />

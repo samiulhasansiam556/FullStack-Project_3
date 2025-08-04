@@ -12,6 +12,7 @@ const Signin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+
     const res = await fetch(`api/auth?login=true`, {
       method: "POST",
       headers: {
@@ -24,7 +25,11 @@ const Signin = () => {
     // console.log("data",data)
 
     if (data.status === 200) {
+      // Store the token in a cookie
       document.cookie = `token=${data.token}; path=/`;
+      // Store user data in localStorage
+      console.log("User data:", data);
+      localStorage.setItem("user", JSON.stringify(data.user));
       router.push("/Dashboard");
     } else {
       alert(data.message);

@@ -13,7 +13,7 @@ export function useAuth(requiredRole = null) {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify`);
             const data = await res.json();
 
-            // console.log("data ",data)
+           //  console.log("data ",data.user)
 
             if (res.status !== 200) {
                 router.push('/SignIn');

@@ -5,15 +5,28 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/userAuth';
 
 export default function CreateBlogForm() {
-  const {user,setUser} = useAuth();
+  const {user, loading} = useAuth();
   const [image, setImage] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+
   const router = useRouter();
-  // console.log(user)
+ 
+  //console.log("user data",user)
+  //console.log("loading",loading)
+
+  // Check if user is authenticated
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (!user) {
+    return <div>Please sign in to create a blog post.</div>;
+  }
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -37,10 +50,17 @@ export default function CreateBlogForm() {
         throw new Error('Failed to create blog');
       }
       const data = await response.json();
+     // console.log('Blog created:', data);
+      alert('Blog created successfully!');
+      setTitle('');
+      setCategory('');
+      setContent('');
+      setImage('');
+      setIsSubmitting(false);
 
-       // console.log('Blog created:', data);
-        router.push('/Dashboard'); 
+      //router.push('/Dashboard'); 
       //  router.push(`/blog/blog-details/${data.id}`); // Redirect to the new blog post
+  
     } catch (err) {
       setError(err.message || 'Something went wrong');
     } finally {

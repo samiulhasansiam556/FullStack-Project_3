@@ -1,9 +1,10 @@
 "use client";
 
 import NavIn from "@/components/nav/NavIn";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { useAuth } from "@/hooks/userAuth";
 
 export default function Page() {
   const [categories, setCategories] = useState([]);
@@ -12,34 +13,37 @@ export default function Page() {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState(null);
+  const [categoryExists, setCategoryExists] = useState(false);
 
   const api = process.env.NEXT_PUBLIC_API_URL;
 
   // Fetch categories on load
-  useEffect(() => {
-    axios
-      .get(`${api}/get-category`)
-      .then((res) => {
-        console.log(res.data.categories); // ✅ CORRECT
-        if (!res.data.categories || res.data.categories.length === 0) {
-          setError("No categories found");
-        } else {
-          setError(null);
-        }
-        setCategories(res.data.categories); // ✅ CORRECT
+useEffect(() => {
+  axios
+    .get(`${api}/get-category`)
+    .then((res) => {
+      const categories = res.data?.categories;
+       //console.log(res.data); // ✅ CORRECT
+       //console.log(categories); // ✅ CORRECT
 
-        if (res.data.categories.length > 0) {
-          setSelectedCategoryId(res.data.categories[0]._id);
-        }
+      if (!categories || categories.length === 0) {
+        setCategoryExists("No categories found");
+      } else {
+        setCategories(categories);
+        setSelectedCategoryId(categories[0]._id); // ✅ Safe to access
+        console.log(selectedCategoryId)
+        setError(null);
+      }
 
-        setLoadingCategories(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching categories:", err);
-        setError("Failed to fetch categories");
-        setLoadingCategories(false);
-      });
-  }, []);
+      setLoadingCategories(false);
+    })
+    .catch((err) => {
+      console.error("Error fetching categories:", err);
+      setError("Failed to fetch categories");
+      setLoadingCategories(false);
+    });
+}, []);
+
 
   // Fetch blogs when category changes
   useEffect(() => {
@@ -48,13 +52,15 @@ export default function Page() {
       setLoadingPosts(false);
       return;
     }
+   //  console.log(selectedCategoryId)
 
     setLoadingPosts(true);
     axios
       .get(`${api}/get-blog-by-categories/${selectedCategoryId}`)
       .then((res) => {
+        console.log("posts", res.data);
         setPosts(res.data.blogs[0].blogid || []);
-        console.log(posts);
+      
         setLoadingPosts(false);
       })
       .catch((err) => {
@@ -63,6 +69,8 @@ export default function Page() {
         setLoadingPosts(false);
       });
   }, [selectedCategoryId]);
+
+ //  console.log("post",posts);
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategoryId(categoryId);
@@ -171,6 +179,7 @@ export default function Page() {
                     {post.content?.substring(0, 100)}...
                   </p>
                   <div className="flex flex-wrap gap-4">
+                    {/* {post._id} */}
                     <Link
                       href={`/blog-details/${post._id}`}
                       className="text-blue-600 font-medium hover:underline"

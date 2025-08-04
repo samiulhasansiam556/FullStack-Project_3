@@ -10,16 +10,15 @@ cloudinary.config({
 export async function POST(req) {
   try {
     const { paramsToSign } = await req.json();
-    console.log("Params to Sign (before modification):", paramsToSign);
+    //console.log("Params to Sign (before modification):", paramsToSign);
 
     // Ensure folder is included before signing
-   
     const signature = cloudinary.utils.api_sign_request(
       paramsToSign,
       process.env.CLOUDINARY_API_SECRET
     );
 
-    console.log("Generated Signature:", signature);
+   // console.log("Generated Signature:", signature);
     return NextResponse.json({ signature});
   } catch (error) {
     console.error("Cloudinary Signature Error:", error);
