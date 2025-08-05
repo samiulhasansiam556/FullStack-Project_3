@@ -1,64 +1,27 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
-import { middleware } from "../../../middleware/protectedRoute";
+import { middleware } from "@/app/middleware/protectedRoute";
 import Blog from "@/models/blogModel";
 import Comment from "@/models/commentModel";
-
 import DBConnection from "@/lib/Db";
 
-export async function GET(req, { params }) {
-  //console.log("I am comment get route");
-  const { id } = await params;
-  const blogId = id[0];
-  const decode = middleware(req);
 
-  if (decode instanceof NextResponse) {
-    return decode; // This will return the 401 Unauthorized response from middleware
-  }
-
-  try {
-    await DBConnection();
-
-    if (!mongoose.Types.ObjectId.isValid(blogId)) {
-      return NextResponse.json({ status: 400, message: "invalid" });
-    }
-
-    const blog = await Blog.findById(blogId).populate({
-      path: "comments",
-      populate: {
-        path: "user", // Populate user inside each like
-        select: "name email profileImage", // Optional: select specific fields
-      },
-    });
-
-    // console.log(blog);
-    // console.log(blog.likes);
-    if (!blog) {
-      return NextResponse.json({ status: 400, message: "Blog does not exist" });
-    }
-
-    return NextResponse.json({
-      status: 200,
-      message: "Success",
-      comments: blog.comments,
-    });
-  } catch (err) {
-    return NextResponse.json({ status: 200, message: "Success" });
-  }
-}
 
 export async function POST(req, { params }) {
-  console.log(params);
-  const blogId = params.id[0];
-  console.log(blogId);
+  
+  const {id} =  await params;
+ // console.log(id);
+  
+  const blogId = id[0];
 
   const { comment } = await req.json();
-  console.log(comment);
+  //console.log(comment);
 
   await DBConnection();
 
   try {
     const decode = middleware(req);
+    //console.log(decode)
 
     if (decode instanceof NextResponse) {
       return decode;
@@ -74,8 +37,10 @@ export async function POST(req, { params }) {
       });
     }
 
+  //  console.log("decode",decode.id);
+
     const newComment = await Comment.create({
-      user: decode._id,
+      user: decode.id,
       blog: blogId,
       comment,
     });
@@ -97,10 +62,70 @@ export async function POST(req, { params }) {
   }
 }
 
+
+export async function GET(req, { params }) {
+  
+  const { id } = await params;
+  //console.log("id", id);
+  const blogId = id[0];
+
+  if (!blogId) {
+    return NextResponse.json({ status: 400, message: "Blog ID is required" });
+  }
+
+  const decode = middleware(req);
+
+  if (decode instanceof NextResponse) {
+    return decode; // This will return the 401 Unauthorized response from middleware
+  }
+
+  try {
+    await DBConnection();
+
+    if (!mongoose.Types.ObjectId.isValid(blogId)) {
+      return NextResponse.json({ status: 400, message: "invalid" });
+    }
+
+       const comments = await Comment.find({ blog: blogId })
+      .populate("user", "username profileImage") // Populate user field with username and profileImage
+      .sort({ createdAt: -1 }); // Sort comments by creation date in descending order
+
+       
+     if (!comments || comments.length === 0) {
+      return NextResponse.json({ status: 400, message: "Blog does not exist" });
+    }
+
+    return NextResponse.json({
+      status: 200,
+      message: "Success",
+      comments: comments,
+    });
+  } catch (err) {
+    return NextResponse.json({ status: 200, message: "Success" });
+  }
+}
+
+
+
 export async function DELETE(req, { params }) {
-  const commentId = params.id[0];
-  const blogId = params.id[1];
-  console.log(commentId, blogId);
+   
+  const {id} = await params;
+  const commentId = id[0];
+  const blogId = id[1];
+
+  //console.log("commentId", commentId);
+  //console.log("blogId", blogId);
+
+  if (!commentId || !blogId) {
+    return NextResponse.json({
+      status: 400,
+      message: "Comment ID and Blog ID are required",
+    });
+  }
+  // Ensure the database connection is established
+  // console.log("commentId", commentId);
+  // console.log("blogId", blogId);
+
   await DBConnection();
 
   try {
@@ -116,6 +141,26 @@ export async function DELETE(req, { params }) {
     ) {
       return NextResponse.json({ status: 400, message: "id is invalid" });
     }
+    const comment = await Comment.findById(commentId);
+    //  console.log("comment", comment);
+    // console.log(decode.id)
+
+     if( comment.user.toString() !== decode.id.toString()) {
+      return NextResponse.json({
+        status: 403,
+        message: "You are not authorized to delete this comment",
+      });
+    }   
+    if (!comment) {
+      return NextResponse.json({
+        status: 404,
+        message: "Comment not found",
+      });
+
+     }
+
+    // Delete the comment and remove it from the blog's comments array
+
     const deleteComment = await Comment.findByIdAndDelete(commentId);
 
     if (deleteComment) {
