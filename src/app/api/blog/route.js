@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   const { title, category, content } = await req.json();
-  console.log(title, content, category);
+  //console.log(title, content, category);
 
   if (!title || !content || !category) {
     return NextResponse.json({
@@ -30,9 +30,9 @@ export async function POST(req) {
     if (!user) {
       return NextResponse.json({ status: 400, message: "User does not exist" });
     }
-    const existingCategory = await Category.findOne({ name: category });
+    const existingCategory = await Category.findOne({ name: category, userid: decode.id });
 
-    const categoryData = existingCategory || (await Category.create({ name: category }));
+    const categoryData = existingCategory || (await Category.create({ name: category, userid: decode.id }));
 
     //console.log(categoryData);
 
@@ -77,7 +77,13 @@ export async function POST(req) {
     //console.log(blog);
 
     if (blog) {
-      await User.updateOne({ _id: decode.id }, { $push: { blogs: blog._id } });
+      await User.updateOne(
+      { _id: decode.id },
+      {
+        $push: { blogs: blog._id },
+        $addToSet: { categories: categoryId } // ensures unique categoryId
+      }
+      );
     }
     return NextResponse.json({ status: 200, blog, message: "Success", blog });
   } catch (err) {

@@ -2,10 +2,17 @@ import Category from "@/models/categoryModel";
 import { middleware } from "../../middleware/protectedRoute";
 import { NextResponse } from "next/server";
 import DBConnection from "@/lib/Db";
-import Blog from "@/models/blogModel";
+
 
 export async function GET(req, res) {
-  await DBConnection(); // Ensure the database connection is established
+ 
+   //  const { id } = await req.params;
+  // console.log("id",id)
+  // if (!id) {
+  //   return NextResponse.json({ status: 400, message: "Category ID is required" });
+  // }
+
+   await DBConnection(); // Ensure the database connection is established
   try {
     // console.log(req)
     const decode = middleware(req); // Middleware to check authentication
@@ -14,8 +21,9 @@ export async function GET(req, res) {
       return decode; // If middleware returns a response, return it
     }
 
-    const categories = await Category.find().populate("blogid"); // Populate blogid field
-   // console.log("ccc", categories);
+
+    const categories = await Category.find({ userid: decode.id }).populate("blogid"); // Populate blogid field and check userid
+   console.log("ccc", categories);
     if (!categories || categories.length === 0) {
       return NextResponse.json({ status: 404, message: "No categories found" });
     }

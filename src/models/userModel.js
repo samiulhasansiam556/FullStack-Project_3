@@ -16,7 +16,8 @@ const userSchema = new mongoose.Schema(
       country: { type: String  },
     },
     profileImage: { type: String },
-    blogs: [{type: mongoose.Schema.Types.ObjectId, ref: 'Blog'}]
+    blogs: [{type: mongoose.Schema.Types.ObjectId, ref: 'Blog'}],
+    categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
   
   },
   {

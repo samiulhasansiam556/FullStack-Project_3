@@ -16,6 +16,7 @@ export default function Page() {
   const [categoryExists, setCategoryExists] = useState(false);
 
   const api = process.env.NEXT_PUBLIC_API_URL;
+  const { user } = useAuth();
 
   // Fetch categories on load
 useEffect(() => {
