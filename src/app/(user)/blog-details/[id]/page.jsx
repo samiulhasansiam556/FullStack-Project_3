@@ -7,9 +7,9 @@ import axios from "axios";
 
 export default function BlogDetails() {
  
-  const { user } = useAuth();
+  const { user,loading} = useAuth();
 
-  const { id ,loading} = useParams();
+  const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -48,9 +48,14 @@ export default function BlogDetails() {
       setLikes(response.data.likes);
       if (blog && blog.user) {
         const liked = response.data.likes.some(
-          (like) => like.user && like.user._id === blog.user._id
-        );
-        setLiked(true);
+    (like) => like.user && like.user._id === user._id
+  );
+        if (liked) {
+          setLiked(true);
+        } else {
+          setLiked(false);
+        }
+         
       } else {
         setLiked(false);
       }
@@ -81,13 +86,19 @@ export default function BlogDetails() {
     try {
       await axios.post(`/api/like/${id}`);
       const response = await axios.get(`${api}/blog/${id}`);
+      setBlog(response.data.blog);
+  
+      // Refresh likes after liking/unliking
       await fetchLikes();
+  
     } catch (err) {
       console.error("Failed to like blog", err);
     } finally {
       setIsLiking(false);
     }
   };
+
+  console.log(liked)
 
   const openLikesModal = async () => {
     await fetchLikes();

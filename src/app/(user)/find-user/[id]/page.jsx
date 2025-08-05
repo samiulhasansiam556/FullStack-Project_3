@@ -4,9 +4,12 @@ import NavIn from "@/components/nav/NavIn";
 import React, { use, useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { useParams } from 'next/navigation'
 import { useAuth } from "@/hooks/userAuth";
 
+
 export default function Page() {
+  const { user,loading } = useAuth();
   const [categories, setCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -16,12 +19,18 @@ export default function Page() {
   const [categoryExists, setCategoryExists] = useState(false);
 
   const api = process.env.NEXT_PUBLIC_API_URL;
-  const { user } = useAuth();
+
+    const params = useParams()
+    const { id } = params;
+
+  //  console.log(id)
+    
+
 
   // Fetch categories on load
 useEffect(() => {
   axios
-    .get(`${api}/get-category`)
+    .get(`${api}/get-categories-by-user/${id}`)
     .then((res) => {
       const categories = res.data?.categories;
        //console.log(res.data); // ✅ CORRECT
@@ -88,23 +97,7 @@ useEffect(() => {
       });
   };
 
-  const handleCategoryDelete = (cat) => {
-    axios
-      .delete(`${api}/delete-category/${cat._id}`)
-      .then(() => {
-        setCategories(categories.filter((c) => c._id !== cat._id));
-        if (selectedCategoryId === cat._id) {
-          setSelectedCategoryId(
-            categories.length > 1
-              ? categories.find((c) => c._id !== cat._id)?._id || null
-              : null
-          );
-        }
-      })
-      .catch((err) => {
-        console.error("Error deleting category:", err);
-      });
-  };
+
 
   // Loading State
   if (loadingCategories || loadingPosts) {
@@ -145,11 +138,7 @@ useEffect(() => {
                   >
                     {cat.name}
                   </button>
-                  <button onClick={() => handleCategoryDelete(cat)}
-                    className="ml-2 text-white hover:underline text-sm bg-red-600 rounded px-2 py-1"
-                  >
-                    Delete
-                  </button>
+                  
                 </li>
               ))}
             </ul>
@@ -187,18 +176,7 @@ useEffect(() => {
                     >
                       Read more
                     </Link>
-                    <Link
-                      href={`/edit-blog/${post._id}`}
-                      className="text-green-600 font-medium hover:underline"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(post._id)}
-                      className="text-red-600 font-medium hover:underline"
-                    >
-                      Delete
-                    </button>
+                 
                   </div>
                 </div>
               ))
@@ -215,14 +193,7 @@ useEffect(() => {
         </main>
       </div>
 
-      {/* Create Blog Button */}
-      <div className="fixed bottom-6 right-6">
-        <Link href="/create-blog">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full shadow-lg transition">
-            + Create Blog
-          </button>
-        </Link>
-      </div>
+     
     </div>
   );
 }
