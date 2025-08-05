@@ -21,7 +21,7 @@ export default function Page() {
   // Fetch categories on load
 useEffect(() => {
   axios
-    .get(`${api}/get-category`)
+    .get(`/api/get-category`)
     .then((res) => {
       const categories = res.data?.categories;
        //console.log(res.data); // ✅ CORRECT
@@ -57,7 +57,7 @@ useEffect(() => {
 
     setLoadingPosts(true);
     axios
-      .get(`${api}/get-blog-by-categories/${selectedCategoryId}`)
+      .get(`/api/get-blog-by-categories/${selectedCategoryId}`)
       .then((res) => {
         console.log("posts", res.data);
         setPosts(res.data.blogs[0].blogid || []);
@@ -79,7 +79,7 @@ useEffect(() => {
 
   const handleDelete = (id) => {
     axios
-      .delete(`${api}/blog/${id}`)
+      .delete(`/api/blog/${id}`)
       .then(() => {
         setPosts(posts.filter((post) => post._id !== id));
       })
@@ -90,7 +90,7 @@ useEffect(() => {
 
   const handleCategoryDelete = (cat) => {
     axios
-      .delete(`${api}/delete-category/${cat._id}`)
+      .delete(`/api/delete-category/${cat._id}`)
       .then(() => {
         setCategories(categories.filter((c) => c._id !== cat._id));
         if (selectedCategoryId === cat._id) {

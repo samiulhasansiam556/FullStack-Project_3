@@ -25,7 +25,7 @@ export default function BlogDetails() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(`${api}/blog/${id}`);
+        const response = await axios.get(`/api/blog/${id}`);
         setBlog(response.data.blog);
       } catch (err) {
         setError("Failed to fetch blog");
@@ -38,7 +38,7 @@ export default function BlogDetails() {
 
   const fetchLikes = async () => {
     try {
-      const response = await axios.get(`${api}/like/${id}`);
+      const response = await axios.get(`/api/like/${id}`);
       setLikes(response.data.likes);
       if (blog && blog.user) {
         const liked = response.data.likes.some(
@@ -61,7 +61,7 @@ export default function BlogDetails() {
 
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`${api}/comment/${id}`);
+      const response = await axios.get(`/api/comment/${id}`);
       setComments(response.data.comments);
     } catch (err) {
       console.error("Failed to fetch comments", err);
@@ -71,8 +71,8 @@ export default function BlogDetails() {
   const handleLike = async () => {
     setIsLiking(true);
     try {
-      await axios.post(`${api}/like/${id}`);
-      const response = await axios.get(`${api}/blog/${id}`);
+      await axios.post(`/api/like/${id}`);
+      const response = await axios.get(`/api/blog/${id}`);
       setBlog(response.data.blog);
       await fetchLikes();
     } catch (err) {
@@ -89,7 +89,7 @@ export default function BlogDetails() {
   const submitComment = async () => {
     if (!newComment.trim()) return alert("Comment cannot be empty!");
     try {
-      await axios.post(`${api}/comment/${id}`, {
+      await axios.post(`/api/comment/${id}`, {
         comment: newComment,
       });
       setNewComment("");
@@ -304,7 +304,7 @@ export default function BlogDetails() {
                         <button
                           onClick={async () => {
                             try {
-                              await axios.delete(`${api}/comment/${comment._id}/${blog._id}`);
+                              await axios.delete(`/api/comment/${comment._id}/${blog._id}`);
                               await fetchComments();
                             } catch (err) {
                               alert("Failed to delete comment");

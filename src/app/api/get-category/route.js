@@ -23,7 +23,7 @@ export async function GET(req, res) {
 
 
     const categories = await Category.find({ userid: decode.id }).populate("blogid"); // Populate blogid field and check userid
-   console.log("ccc", categories);
+    // console.log("ccc", categories);
     if (!categories || categories.length === 0) {
       return NextResponse.json({ status: 404, message: "No categories found" });
     }
