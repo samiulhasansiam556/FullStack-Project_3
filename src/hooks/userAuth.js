@@ -26,7 +26,7 @@ export function useAuth(requiredRole = null) {
         }
 
         checkAuth();
-    }, [requiredRole]);
+    }, [requiredRole,router]);
 
     return { user, loading };
 }

@@ -1,4 +1,5 @@
 import Category from "@/models/categoryModel";
+import Blog from "@/models/blogModel";
 import { middleware } from "../../middleware/protectedRoute";
 import { NextResponse } from "next/server";
 import DBConnection from "@/lib/Db";

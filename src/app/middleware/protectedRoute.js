@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import cookie from "cookie";
+import * as cookie from "cookie";
 
 const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET;
 

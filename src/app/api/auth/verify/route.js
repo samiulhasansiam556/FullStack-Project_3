@@ -2,7 +2,9 @@ import DBConnection from "@/lib/Db";
 import User from "@/models/userModel";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import cookie from "cookie";
+import * as cookie from "cookie";
+//import { parse } from "cookie"; its not working in nextjs 14
+
 
 export async function GET(req) {
   // const token = cookies().get('token')?.value;
